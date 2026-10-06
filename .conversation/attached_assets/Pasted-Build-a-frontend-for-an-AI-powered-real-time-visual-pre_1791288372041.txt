@@ -1,0 +1,1030 @@
+Build a frontend for an **AI-powered real-time visual presentation assistant**.
+
+The application is NOT intended to replace PowerPoint. It is a **lecture/presentation augmentation system** that listens to live speech, understands the current topic and presentation state, and displays relevant visual content when useful.
+
+The frontend must be simple, professional, natural-looking, responsive, technically correct, and easy to use during a real lecture.
+
+## 1. Technology requirements
+
+Use exactly:
+
+- React
+- TypeScript
+- TSX
+- React Router
+- Plain CSS / CSS modules
+- No Tailwind CSS
+- No unnecessary UI libraries
+- Component-based architecture
+- Clean separation of components, pages, hooks, services, types, and styles
+- Use WebSocket-ready architecture for future real-time speech/context updates
+- Do not implement IoT features
+- Do not create unnecessary microservices in the frontend
+- Do not hardcode fake AI behavior as if it were real
+
+The project must run correctly with:
+
+```bash
+npm install
+npm run dev
+npm run build
+```
+
+No TypeScript errors, no broken imports, no missing routes, no console errors, and no placeholder functionality presented as completed functionality.
+
+---
+
+# 2. Main product concept
+
+The lecturer first creates a session and enters the topics they intend to cover.
+
+Example:
+
+```text
+Machine Learning
+
+1. Introduction
+2. Supervised Learning
+3. Classification
+4. Regression
+5. Neural Networks
+```
+
+During the session:
+
+```text
+Microphone
+   ↓
+Live speech recognition
+   ↓
+Context understanding
+   ↓
+Presentation state
+   ↓
+Visual recommendation / visual display
+```
+
+The frontend must visualize this process clearly.
+
+The frontend should support these presentation states:
+
+```text
+ACTIVE
+FOCUS
+EXAMPLE
+DISCUSSION
+Q_AND_A
+MANUAL_LOCK
+RESUME_PENDING
+```
+
+The lecturer must always be able to override the AI.
+
+---
+
+# 3. Overall UI philosophy
+
+Do NOT make the interface look like a complicated enterprise dashboard.
+
+Design it like a modern educational/professional application.
+
+Use:
+
+- generous spacing
+- clear typography
+- simple cards
+- subtle borders
+- restrained use of colors
+- clear visual hierarchy
+- minimal icons
+- no excessive gradients
+- no excessive animations
+- no unnecessary charts
+- no crowded sidebars
+
+The primary screen should always focus on:
+
+1. What topic is being discussed
+2. What the system is currently doing
+3. What visual is being shown
+4. Whether AI visual assistance is active or paused
+5. How the lecturer can override it
+
+The UI must be understandable without documentation.
+
+---
+
+# 4. Application pages
+
+Create these main routes:
+
+```text
+/
+ /sessions
+ /sessions/new
+ /sessions/:sessionId
+ /sessions/:sessionId/live
+ /sessions/:sessionId/summary
+ /settings
+```
+
+## Home page
+
+Show:
+
+```text
+Dynamic Visual Assistant
+```
+
+Subtitle:
+
+```text
+Enhance live lectures and presentations with context-aware visuals.
+```
+
+Primary action:
+
+```text
+Create Session
+```
+
+Secondary action:
+
+```text
+View Sessions
+```
+
+Keep the page visually simple.
+
+---
+
+# 5. Session creation page
+
+Create a clean form.
+
+Fields:
+
+```text
+Session Title
+Subject
+Description (optional)
+Estimated Duration
+```
+
+Then:
+
+```text
+Topics to Cover
+```
+
+Allow the lecturer to add, remove, reorder, and edit topics.
+
+Example:
+
+```text
+1  Introduction              ↑ ↓
+2  Supervised Learning      ↑ ↓
+3  Classification           ↑ ↓
+4  Regression               ↑ ↓
+5  Neural Networks          ↑ ↓
+```
+
+Allow optional subtopics.
+
+Example:
+
+```text
+Classification
+   ├── Binary classification
+   ├── Multiclass classification
+   └── Decision boundaries
+```
+
+Buttons:
+
+```text
+Save Session
+Start Session
+Cancel
+```
+
+Validation must prevent:
+
+- empty session title
+- empty topic names
+- duplicate topic IDs
+- invalid duration
+- accidental submission
+
+Do not put complex AI configuration on this page.
+
+---
+
+# 6. Session overview page
+
+Show the lecturer:
+
+```text
+Session title
+Subject
+Duration
+Topic count
+Session status
+```
+
+Display the topic sequence.
+
+Example:
+
+```text
+Session Progress
+
+✓ Introduction
+✓ Supervised Learning
+● Classification
+○ Regression
+○ Neural Networks
+```
+
+Provide:
+
+```text
+Start Live Session
+Edit Session
+View Summary
+```
+
+---
+
+# 7. Main live presentation page
+
+This is the most important page.
+
+It should have a very clean layout.
+
+Use this structure:
+
+```text
+┌──────────────────────────────────────────────────────┐
+│ Header                                               │
+│ Session title                 ● LIVE                 │
+├──────────────────────────────────────────────────────┤
+│                                                      │
+│                 VISUAL AREA                          │
+│                                                      │
+│            Current image / diagram / video           │
+│                                                      │
+│                                                      │
+├───────────────────────┬──────────────────────────────┤
+│ Session Context       │ AI Status                    │
+│                       │                              │
+│ Current Topic         │ ● Visual Assistance Active   │
+│ Classification        │                              │
+│                       │ State: ACTIVE                │
+│ Next Topic            │ Confidence: 91%              │
+│ Regression            │                              │
+├───────────────────────┴──────────────────────────────┤
+│ Controls                                             │
+│                                                      │
+│ [Pause Visuals] [Lock Visual] [Resume] [Next]       │
+└──────────────────────────────────────────────────────┘
+```
+
+Do not make the controls tiny.
+
+They must be usable while teaching.
+
+---
+
+# 8. Presentation state indicator
+
+This is critical.
+
+Show the current presentation state clearly.
+
+Examples:
+
+```text
+● ACTIVE
+```
+
+```text
+🔒 FOCUS — Deep Explanation
+```
+
+```text
+▶ EXAMPLE
+```
+
+```text
+⏸ VISUALS PAUSED
+```
+
+```text
+🔒 MANUAL LOCK
+```
+
+The state should never be ambiguous.
+
+---
+
+# 9. Focus mode
+
+When the lecturer is explaining a topic deeply, the system should stop changing visuals while continuing to track speech/context.
+
+The UI should clearly show:
+
+```text
+FOCUS MODE
+
+Visual assistance is temporarily paused while context tracking continues.
+```
+
+Do NOT display "microphone paused".
+
+Speech recognition must remain visually represented as active.
+
+Important distinction:
+
+```text
+Speech Recognition = ACTIVE
+Visual Switching = PAUSED
+```
+
+Do not incorrectly present these as the same thing.
+
+Provide:
+
+```text
+Resume Visuals
+```
+
+and:
+
+```text
+Continue Automatically
+```
+
+if appropriate.
+
+---
+
+# 10. Resume pending state
+
+When the system detects something such as:
+
+```text
+"For example..."
+"Let's look at..."
+"Consider this..."
+"Now let's compare..."
+```
+
+the backend may send:
+
+```text
+RESUME_PENDING
+```
+
+The frontend should show:
+
+```text
+Possible transition detected
+
+Resume visual assistance?
+
+[Resume] [Stay Focused]
+```
+
+Do NOT automatically claim that the AI has correctly understood the lecturer.
+
+The frontend should display the actual backend state.
+
+---
+
+# 11. Manual controls
+
+The lecturer must always have control.
+
+Implement:
+
+```text
+Pause Visuals
+Resume Visuals
+Lock Current Visual
+Unlock
+Previous Visual
+Next Visual
+Show Alternative
+```
+
+Voice commands are backend functionality, but the frontend must provide equivalent buttons.
+
+Manual actions must have priority visually over AI recommendations.
+
+For example:
+
+```text
+MANUAL LOCK
+```
+
+must remain visibly locked until the lecturer unlocks it.
+
+---
+
+# 12. Visual area
+
+The visual area should support:
+
+```text
+Image
+Diagram
+Video
+Chart
+Equation
+Interactive visual
+```
+
+Do not implement fake interactive functionality.
+
+Create a reusable component:
+
+```text
+VisualViewer
+```
+
+It should accept a typed visual object such as:
+
+```ts
+type VisualType =
+  | "image"
+  | "diagram"
+  | "video"
+  | "chart"
+  | "equation"
+  | "interactive";
+```
+
+For unsupported visual types, show a safe fallback instead of crashing.
+
+Example:
+
+```text
+Visual unavailable
+```
+
+Never render a broken image icon or undefined URL.
+
+---
+
+# 13. Visual metadata
+
+When appropriate, show small metadata below the visual:
+
+```text
+Classification
+Concept Diagram
+
+Source: Verified Content
+```
+
+Avoid displaying long technical metadata to the lecturer.
+
+The visual should remain the primary focus.
+
+---
+
+# 14. Topic progress
+
+Create a compact progress component:
+
+```text
+Lecture Progress
+
+✓ Introduction
+✓ Supervised Learning
+● Classification
+○ Regression
+○ Neural Networks
+```
+
+The current topic should be visually obvious.
+
+Do not automatically mark topics complete unless the backend explicitly reports them as completed.
+
+Never infer completion solely from elapsed time.
+
+---
+
+# 15. AI confidence
+
+If backend confidence is available, show it.
+
+Example:
+
+```text
+AI Confidence
+91%
+```
+
+If confidence is unavailable:
+
+```text
+AI Confidence
+—
+```
+
+Do NOT invent percentages.
+
+Never show fake confidence values just to make the UI look complete.
+
+---
+
+# 16. Live transcript
+
+Include an optional collapsible transcript panel.
+
+Example:
+
+```text
+Live Transcript
+
+"...classification is the process of assigning..."
+"...we can divide the observations into..."
+```
+
+The transcript should update incrementally.
+
+Do not constantly rebuild the entire page when a new transcript segment arrives.
+
+Use a bounded transcript window for performance.
+
+Provide:
+
+```text
+Show transcript
+Hide transcript
+```
+
+---
+
+# 17. Connection status
+
+The live session must clearly show connection status.
+
+States:
+
+```text
+Connected
+Connecting
+Reconnecting
+Disconnected
+```
+
+Example:
+
+```text
+● Connected
+```
+
+When disconnected:
+
+```text
+⚠ Connection lost
+Reconnecting...
+```
+
+Do not show the application as "LIVE" if the realtime connection is actually disconnected.
+
+The UI must distinguish:
+
+```text
+session running
+```
+
+from:
+
+```text
+realtime connection available
+```
+
+---
+
+# 18. End session behavior
+
+When the lecturer presses:
+
+```text
+End Session
+```
+
+show a confirmation dialog.
+
+After confirmation:
+
+```text
+Session complete
+```
+
+Then navigate to:
+
+```text
+/session/:sessionId/summary
+```
+
+---
+
+# 19. Summary page
+
+Display:
+
+```text
+Session Summary
+```
+
+Include:
+
+```text
+Session duration
+Topics covered
+Topics partially covered
+Topics not covered
+Number of visuals displayed
+Number of manual overrides
+Number of visual pauses
+```
+
+Do not invent analytics.
+
+Only display values supplied by the backend.
+
+If data isn't available:
+
+```text
+Not available
+```
+
+---
+
+# 20. Realtime architecture
+
+Prepare the frontend for WebSocket events.
+
+Create a dedicated service:
+
+```text
+src/services/realtime/
+```
+
+The frontend should be capable of receiving events such as:
+
+```ts
+type RealtimeEvent =
+  | {
+      type: "transcript";
+      text: string;
+    }
+  | {
+      type: "topic_update";
+      topicId: string;
+    }
+  | {
+      type: "state_update";
+      state: PresentationState;
+    }
+  | {
+      type: "visual_update";
+      visual: Visual;
+    }
+  | {
+      type: "connection_status";
+      status: ConnectionStatus;
+    }
+  | {
+      type: "resume_pending";
+      reason: string;
+    };
+```
+
+Do not place WebSocket logic directly inside UI components.
+
+Use a custom hook such as:
+
+```text
+useRealtimeSession()
+```
+
+---
+
+# 21. API layer
+
+Create a separate API client.
+
+Example:
+
+```text
+src/services/api/
+```
+
+Possible modules:
+
+```text
+sessionApi.ts
+visualApi.ts
+analyticsApi.ts
+```
+
+Components must not directly use `fetch()` everywhere.
+
+Use typed API functions.
+
+Do not hardcode backend URLs throughout the project.
+
+Use environment configuration.
+
+Example:
+
+```text
+VITE_API_BASE_URL
+VITE_WS_BASE_URL
+```
+
+---
+
+# 22. State management
+
+Do not introduce Redux unless it is actually necessary.
+
+Prefer:
+
+- React state
+- Context where appropriate
+- custom hooks
+- centralized session state
+
+The live page should have a clear single source of truth for:
+
+```text
+currentTopic
+presentationState
+currentVisual
+connectionStatus
+transcript
+sessionProgress
+```
+
+Avoid duplicated state that can become inconsistent.
+
+---
+
+# 23. Component structure
+
+Use clean reusable components.
+
+Suggested structure:
+
+```text
+src/
+├── components/
+│   ├── common/
+│   ├── session/
+│   ├── live/
+│   ├── visuals/
+│   ├── transcript/
+│   └── status/
+│
+├── pages/
+│   ├── HomePage.tsx
+│   ├── SessionsPage.tsx
+│   ├── NewSessionPage.tsx
+│   ├── SessionOverviewPage.tsx
+│   ├── LiveSessionPage.tsx
+│   ├── SessionSummaryPage.tsx
+│   └── SettingsPage.tsx
+│
+├── hooks/
+├── services/
+│   ├── api/
+│   └── realtime/
+│
+├── types/
+├── utils/
+├── styles/
+└── App.tsx
+```
+
+Do not create giant 500–1000 line components.
+
+Each major section should be its own component.
+
+---
+
+# 24. Error handling
+
+Implement proper frontend error handling.
+
+Examples:
+
+```text
+Failed to load session
+```
+
+```text
+Unable to connect to realtime service
+```
+
+```text
+Visual unavailable
+```
+
+```text
+Session could not be created
+```
+
+Use retry actions where appropriate.
+
+Never silently fail.
+
+Do not use alert() for normal application errors.
+
+---
+
+# 25. Loading states
+
+Every asynchronous operation needs an appropriate loading state.
+
+Use skeletons or subtle loaders for:
+
+```text
+Session loading
+Visual loading
+Summary loading
+Connecting
+```
+
+Do not show a blank screen while waiting for an API response.
+
+---
+
+# 26. Responsive design
+
+The live presentation page should work on:
+
+- laptop
+- desktop
+- tablet
+
+For small screens, rearrange rather than simply shrinking everything.
+
+The visual area should remain dominant.
+
+---
+
+# 27. Accessibility
+
+Implement:
+
+- semantic HTML
+- keyboard navigation
+- visible focus states
+- accessible buttons
+- useful ARIA labels where necessary
+- sufficient contrast
+- no icon-only button without an accessible label
+
+Controls such as:
+
+```text
+Pause
+Resume
+Lock
+Unlock
+Previous
+Next
+```
+
+must be keyboard accessible.
+
+---
+
+# 28. Important logical rules
+
+The frontend must respect these rules:
+
+1. Do not change the visual just because a keyword appears.
+2. Do not automatically switch from FOCUS to ACTIVE without a backend-confirmed transition.
+3. Do not confuse speech recognition status with visual assistance status.
+4. Manual lock must override automatic visual switching.
+5. Do not display fake AI confidence.
+6. Do not mark topics complete unless the backend reports completion.
+7. Do not fabricate transcript text.
+8. Do not fabricate visual sources.
+9. Do not lose the current visual during normal UI state updates.
+10. Do not reset the session state when the component rerenders.
+11. Handle WebSocket reconnection without destroying the current session state.
+12. Prevent duplicate WebSocket connections.
+13. Prevent race conditions between manual actions and incoming realtime events.
+14. Never allow stale realtime events to overwrite newer state.
+15. Validate all API data before rendering it.
+
+---
+
+# 29. Priority rules for UI state
+
+Use this conceptual priority:
+
+```text
+MANUAL COMMAND
+      ↓
+MANUAL LOCK
+      ↓
+BACKEND PRESENTATION STATE
+      ↓
+BACKEND VISUAL UPDATE
+      ↓
+CONTEXT INFORMATION
+```
+
+The frontend should never independently invent a presentation state that conflicts with the backend state.
+
+The frontend is responsible for **displaying and controlling the session**, not pretending to be the AI engine.
+
+---
+
+# 30. Demo mode
+
+Create a clearly separated optional development/demo mode.
+
+Demo mode may simulate:
+
+```text
+transcript updates
+topic changes
+state changes
+visual changes
+```
+
+But it must be obvious that this is:
+
+```text
+DEMO MODE
+```
+
+Never mix demo data with production realtime data.
+
+---
+
+# 31. Design output
+
+The final UI should feel like:
+
+```text
+Modern educational technology
++
+Minimal professional dashboard
++
+Presentation-focused workspace
+```
+
+Avoid:
+
+- neon colors
+- excessive glassmorphism
+- excessive gradients
+- unnecessary 3D effects
+- giant rounded cards
+- dense dashboard layouts
+- excessive animations
+- fake AI "magic" effects
+
+Animations should only communicate:
+
+- visual transition
+- state transition
+- loading
+- connection status
+
+---
+
+# 32. Final implementation requirement
+
+Before finishing:
+
+1. Run TypeScript type checking.
+2. Run the production build.
+3. Verify every route.
+4. Verify every button has a logical action.
+5. Verify no broken imports.
+6. Verify no undefined properties are rendered.
+7. Verify WebSocket cleanup on unmount.
+8. Verify reconnect behavior.
+9. Verify manual lock behavior.
+10. Verify FOCUS mode behavior.
+11. Verify RESUME_PENDING behavior.
+12. Verify session creation validation.
+13. Verify responsive layouts.
+14. Verify browser console contains no avoidable errors or warnings.
+
+Do not claim something is implemented unless it actually works.
+
+The result should be a **clean frontend foundation ready to connect to a real FastAPI/WebSocket backend**, with no fake AI logic presented as production functionality.

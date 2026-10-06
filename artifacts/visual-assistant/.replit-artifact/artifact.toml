@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Dynamic Visual Assistant"
+description = "A lecture companion for creating sessions, tracking presentation topics, and controlling context-aware visuals during live talks. Includes explicit demo mode and a typed API/WebSocket-ready frontend boundary."
+version = "1.0.0"
+id = "artifacts/visual-assistant"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24574
+
+[services.development]
+run = "pnpm --filter @workspace/visual-assistant run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/visual-assistant", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/visual-assistant/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24574"
+BASE_PATH = "/"
